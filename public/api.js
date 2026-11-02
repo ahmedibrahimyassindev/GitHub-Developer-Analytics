@@ -33,7 +33,7 @@ async function getJson(path, ttl = 15 * 60 * 1000) {
 }
 
 export async function getProfile(username) { return getJson(`/api/github/${encodeURIComponent(username)}`); }
-export async function getContributions(username) { return getJson(`/api/github/${encodeURIComponent(username)}/contributions`, 6 * 60 * 60 * 1000); }
+export async function getContributions(username) { return getJson(`/api/github/${encodeURIComponent(username)}/contributions`, 15 * 60 * 1000); }
 
 export async function getAllRepos(username) {
   const all = [];

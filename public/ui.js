@@ -59,6 +59,9 @@ export function renderLanguages(totals, sampled, available, includeForks) {
 export function renderContributions(calendar) {
   const { total, active } = renderContributionChart($('#activity-chart'), calendar.weeks);
   $('#commit-total').textContent = fmt(calendar.totalContributions ?? total); $('#active-weeks').textContent = String(active);
+  $('#activity-range').textContent = calendar.rangeLabel || 'LAST YEAR';
+  $('#activity-unit').textContent = calendar.source === 'public-events' ? 'observed public push commits' : 'contributions';
+  $('#activity-note').textContent = calendar.source === 'public-events' ? 'Public events · up to 30 days / 300 events' : 'GitHub contribution calendar';
 }
 
 export function renderCompare(primary, other) {

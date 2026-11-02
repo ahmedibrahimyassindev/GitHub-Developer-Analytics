@@ -12,8 +12,10 @@ export function renderContributionChart(container, weeks) {
   const total = days.reduce((sum, day) => sum + day.contributionCount, 0);
   const active = weeks.filter((week) => week.some((day) => day.contributionCount > 0)).length;
   const chart = document.createElement('div'); chart.className = 'activity-chart'; chart.setAttribute('role', 'img');
+  chart.style.gridTemplateColumns = `repeat(${weeks.length}, minmax(2px, 1fr))`;
   chart.setAttribute('aria-label', `${total} contributions over the last year, across ${active} active weeks`);
   const labels = document.createElement('div'); labels.className = 'chart-x-labels';
+  labels.style.gridTemplateColumns = `repeat(${weeks.length}, minmax(2px, 1fr))`;
   const disclosure = document.createElement('details'); disclosure.className = 'activity-details';
   const summary = document.createElement('summary'); summary.textContent = 'View weekly contributions as a table'; disclosure.append(summary);
   const table = document.createElement('table'); table.className = 'activity-table';

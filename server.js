@@ -54,7 +54,7 @@ async function proxyRest(req, res, url, apiPath, ttl) {
 }
 
 async function proxyGraphql(res, username) {
-  if (!token) return send(res, 503, { message: 'Contribution history requires GITHUB_TOKEN in the server .env file.' });
+  if (!token) return proxyPublicEventsCalendar(res, username);
   const key = `graphql:${username}`;
   const current = cache.get(key);
   if (current && current.until > Date.now()) return send(res, 200, current.body, { 'X-Cache': 'HIT' });
@@ -73,6 +73,48 @@ async function proxyGraphql(res, username) {
     cache.set(key, { body: result, until: Date.now() + 6 * 60 * 60 * 1000 });
     return send(res, 200, result, { 'X-Cache': 'MISS' });
   } catch { return send(res, 502, { message: 'Unable to reach GitHub GraphQL API.' }); }
+}
+
+async function proxyPublicEventsCalendar(res, username) {
+  const key = `events:${username}`;
+  const current = cache.get(key);
+  if (current && current.until > Date.now()) return send(res, 200, current.body, { 'X-Cache': 'HIT' });
+  try {
+    const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/events/public?per_page=100`, {
+      headers: { Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'GitHub-Developer-Analytics' }
+    });
+    const extra = { 'X-Cache': 'MISS' };
+    for (const name of ['x-ratelimit-limit', 'x-ratelimit-remaining', 'x-ratelimit-reset']) {
+      const value = response.headers.get(name); if (value) extra[name] = value;
+    }
+    const events = await response.json().catch(() => []);
+    if (!response.ok) return send(res, response.status, events, extra);
+
+    const end = new Date(); end.setHours(0, 0, 0, 0);
+    const start = new Date(end); start.setDate(end.getDate() - 34);
+    const days = Array.from({ length: 35 }, (_, index) => {
+      const date = new Date(start); date.setDate(start.getDate() + index);
+      return { date, contributionCount: 0 };
+    });
+    for (const event of events) {
+      if (event.type !== 'PushEvent') continue;
+      const date = new Date(event.created_at); date.setHours(0, 0, 0, 0);
+      const index = Math.floor((date - start) / 86400000);
+      if (index >= 0 && index < days.length) days[index].contributionCount += Math.max(1, event.payload?.size || event.payload?.commits?.length || 1);
+    }
+    const weeks = Array.from({ length: 5 }, (_, week) => days.slice(week * 7, week * 7 + 7));
+    const result = {
+      totalContributions: days.reduce((sum, day) => sum + day.contributionCount, 0),
+      weeks: weeks.map((week) => week.map((day) => ({ date: day.date.toISOString().slice(0, 10), contributionCount: day.contributionCount }))),
+      source: 'public-events',
+      rangeLabel: 'LAST 30 DAYS'
+    };
+    cache.set(key, { body: result, until: Date.now() + 15 * 60 * 1000 });
+    return send(res, 200, result, extra);
+  } catch {
+    if (current) return send(res, 200, current.body, { 'X-Cache': 'STALE' });
+    return send(res, 502, { message: 'Unable to reach GitHub public events API.' });
+  }
 }
 
 function apiRoute(req, res, url) {

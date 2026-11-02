@@ -10,11 +10,11 @@ Requires Node.js 20 or later. No npm packages are required.
 npm run dev
 ```
 
-Open <http://localhost:5173>. For contribution history locally, copy `.env.example` to `.env` and set `GITHUB_TOKEN`. The token stays in the Node server.
+Open <http://localhost:5173>. A token is optional. Copy `.env.example` to `.env` and set `GITHUB_TOKEN` if you want the full GraphQL contribution calendar; without it, the app uses recent public push events.
 
 ## Deploy to Vercel
 
-The frontend is served as static files from `public/`; the GitHub proxy runs as a Vercel Function under `api/github/`. The repository includes `vercel.json` with `outputDirectory: public`, so use the repository root as the Vercel Root Directory and select the **Other** framework preset. Leave Build Command and Install Command empty. Add `GITHUB_TOKEN` as a Vercel environment variable for Preview and Production deployments to enable contribution history and authenticated API requests.
+The frontend is served as static files from `public/`; the GitHub proxy runs as Vercel Functions under `api/github/`. The repository includes `vercel.json` with `outputDirectory: public` and the **Other** framework preset, so use the repository root as the Vercel Root Directory. Leave Build Command and Install Command empty. Add `GITHUB_TOKEN` as a Vercel environment variable for Preview and Production deployments if you want the full contribution calendar and authenticated API requests; it is optional for the app to run.
 
 ## Data and limits
 
@@ -22,7 +22,7 @@ The frontend is served as static files from `public/`; the GitHub proxy runs as 
 - Repositories are fetched in 100-item pages, up to 1,000 repositories.
 - Language charts use GitHub language endpoint byte counts for up to the 20 most-starred repositories in the selected fork filter. Language responses are cached for 24 hours.
 - Forks are excluded from summary totals and language sampling by default.
-- Contribution history uses GraphQL `contributionsCollection` and requires a server-side token.
+- With `GITHUB_TOKEN`, contribution history uses GraphQL `contributionsCollection`. Without a token, the chart uses public PushEvents, limited by GitHub to the last 30 days and at most 300 events. Unauthenticated REST requests are limited to 60 per hour per IP.
 
 ## Features
 
