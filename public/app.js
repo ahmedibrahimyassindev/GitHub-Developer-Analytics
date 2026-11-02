@@ -62,4 +62,4 @@ $('#compare-form').addEventListener('submit', async (event) => {
 });
 
 const queryUser = new URLSearchParams(location.search).get('user');
-loadUser(queryUser && validUsername(queryUser) ? queryUser : 'octocat', false);
+loadUser(queryUser && validUsername(queryUser) ? queryUser : 'ahmedibrahimyassindev', false);
