@@ -4,7 +4,9 @@
   "private": true,
   "description": "Explore public GitHub profiles and repository activity.",
   "scripts": {
-    "dev": "node server.js",
-    "start": "node server.js"
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

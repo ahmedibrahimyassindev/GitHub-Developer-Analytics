@@ -4,6 +4,7 @@ const path = require('node:path');
 
 loadEnv();
 const root = path.resolve(__dirname);
+const publicRoot = path.join(root, 'public');
 const port = Number(process.env.PORT) || 5173;
 const token = process.env.GITHUB_TOKEN || '';
 const cache = new Map();
@@ -96,7 +97,7 @@ function apiRoute(req, res, url) {
   return send(res, 404, { message: 'Not found.' });
 }
 
-http.createServer((req, res) => {
+const httpServer = http.createServer((req, res) => {
   res.setHeader('Content-Security-Policy', csp);
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -109,11 +110,17 @@ http.createServer((req, res) => {
   try { decoded = decodeURIComponent(url.pathname); } catch { return res.writeHead(400).end('Bad request'); }
   const name = decoded === '/' ? 'index.html' : decoded.replace(/^\/+/, '');
   if (!staticFiles.has(name) || name.includes('..') || path.basename(name) !== name) return res.writeHead(404).end('Not found');
-  const file = path.resolve(root, name);
-  if (!file.startsWith(root + path.sep)) return res.writeHead(403).end('Forbidden');
+  const file = path.resolve(publicRoot, name);
+  if (!file.startsWith(publicRoot + path.sep)) return res.writeHead(403).end('Forbidden');
   fs.readFile(file, (error, data) => {
     if (error) return res.writeHead(error.code === 'ENOENT' ? 404 : 500).end('Not found');
     res.writeHead(200, { 'Content-Type': mime[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
     res.end(data);
   });
-}).listen(port, () => console.log(`GitHub Developer Analytics running at http://localhost:${port}${token ? ' (GitHub token loaded)' : ' (no GitHub token)'}`));
+});
+
+module.exports = { apiRoute };
+
+if (require.main === module) {
+  httpServer.listen(port, () => console.log(`GitHub Developer Analytics running at http://localhost:${port}${token ? ' (GitHub token loaded)' : ' (no GitHub token)'}`));
+}
