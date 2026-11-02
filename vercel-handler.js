@@ -1,4 +1,4 @@
-const { apiRoute } = require('../../server');
+const { apiRoute } = require('./server');
 
 module.exports = async function handler(req, res) {
   try {

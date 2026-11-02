@@ -35,7 +35,8 @@ The frontend is served as static files from `public/`; the GitHub proxy runs as 
 
 ```text
 public/               Static dashboard and browser modules
-api/github/[...path].js Vercel serverless GitHub API proxy
+api/github/           Vercel serverless routes for the GitHub API proxy
+vercel-handler.js     Shared adapter for Vercel function routes
 server.js             Local development server and shared proxy logic
 vercel.json           Vercel static output and security headers
 ```

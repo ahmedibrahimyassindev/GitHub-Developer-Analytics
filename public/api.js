@@ -18,7 +18,7 @@ async function getJson(path, ttl = 15 * 60 * 1000) {
   const reset = response.headers.get('x-ratelimit-reset');
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    if (response.status === 404) throw new Error('That GitHub username could not be found. Check the spelling and try again.');
+    if (response.status === 404 && /^\/api\/github\/[^/]+$/.test(path)) throw new Error('That GitHub username could not be found. Check the spelling and try again.');
     if (response.status === 403 || response.status === 429) {
       const time = reset ? new Date(Number(reset) * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : 'later';
       throw new Error(`GitHub rate limit reached. Try again after ${time}. ${body.message || ''}`.trim());
