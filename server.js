@@ -8,8 +8,8 @@ const publicRoot = path.join(root, 'public');
 const port = Number(process.env.PORT) || 5173;
 const token = process.env.GITHUB_TOKEN || '';
 const cache = new Map();
-const staticFiles = new Set(['index.html', 'styles.css', 'theme.css', 'accessibility.css', 'api.js', 'charts.js', 'ui.js', 'app.js']);
-const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8' };
+const staticFiles = new Set(['index.html', 'styles.css', 'theme.css', 'accessibility.css', 'api.js', 'charts.js', 'ui.js', 'app.js', 'favicon.svg']);
+const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml' };
 const csp = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://avatars.githubusercontent.com data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'";
 
 function loadEnv() {
