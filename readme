@@ -1,0 +1,46 @@
+# GitHub Developer Analytics
+
+A small web app for exploring public GitHub profiles, repositories, programming languages, and recent public activity.
+
+## Current implementation
+
+- Search for a GitHub username and view profile details.
+- See public repository, star, follower, and fork totals.
+- Sort repositories by stars, forks, or recently updated.
+- Compare repository language usage.
+- View recent public push activity.
+- Responsive layout for desktop and mobile.
+
+The app uses plain HTML, CSS, and JavaScript with Node.js serving the static files. It has no package dependencies or build step.
+
+## Run locally
+
+Requirements: Node.js 20 or later.
+
+```bash
+npm run dev
+```
+
+Open <http://localhost:5173> in your browser. To use another port, set the `PORT` environment variable before starting the server.
+
+## Data and limitations
+
+The browser calls the official GitHub REST API directly and only requests public data. No GitHub token is used or stored. Unauthenticated requests have a lower rate limit, so searches can temporarily stop working after frequent use.
+
+GitHub's public user events endpoint returns a limited recent event history. The activity chart counts commit activity from the returned public push events; it is not a complete contribution history. Repository language labels represent each repository's primary language, not byte-level language totals.
+
+## Project files
+
+```text
+index.html   Dashboard structure
+styles.css   Responsive styling
+app.js       GitHub API requests and dashboard rendering
+server.js    Local static file server
+```
+
+## Next steps
+
+- Add a backend API proxy if authenticated or higher-volume requests are needed. Keep any GitHub token on the server.
+- Add repository comparison and organization analytics.
+- Add exportable reports and saved profiles.
+- Replace the recent-events activity estimate with a more complete data source where available.
